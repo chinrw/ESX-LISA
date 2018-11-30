@@ -11,7 +11,62 @@ In order to support ESX, ESX-LISA uses PowerCLI to automate all aspects of vSphe
 including network, storage, VM, guest OS and more. 
 This framework automates the tasks required to test the Redhat Enterprise Linux Server on WMware ESX Server.
 
-# Documentation
+
+## VM provision
+The automation scripts make some assumptions about the VMs
+used to run the tests.  This requires test VMs be provisioned
+prior to running tests. The following settings need to be provisioned.
+
+1.  Disable Linux firewall.
+2.  Add your public key into ~/.ssh/authorized_keys.
+3.  The following packages must be installed.
+    *  development-tools
+    *  at
+    *  dos2unix
+    *  dosfstools
+    *  wget
+    *  bc
+    *  ntpdate
+4.  The yum repo must be configured.
+
+## SSH key
+SSH keys are used to pass commands to Linux VMs, so the public
+ssh Key must to copied to the VM before the test is started.
+
+## dos2unix
+The dos2unix must be installed.  It is used to ensure the file
+has the correct end of line character.
+
+## Putty with private key
+The automation scripts currently use Putty as the SSH client.
+You will need to copy the Putty executables to the ./bin
+directory.  You will also need to convert the private key into
+a Putty Private Key (.ppk).
+
+## PowerCLI
+ESX-LISA framework is based on PowerCLI. Therefore, get PowerCLI for PowerShell from https://www.vmware.com/support/developer/PowerCLI/ 
+
+## Rum ESX-LISA
+1.  Choose a Windows machine which has Powershell installed and have connection with VCenter server
+2.  Add four system environment variables from Control Pannel -> System -> Advanced system settings -> Environment Variables... -> System variables -> New...
+
+    | Name            | Description                                                    |
+    |-----------------|----------------------------------------------------------------|
+    | $ENVVISIPADDR   | vSphere Center Server IP address                               |
+    | $ENVVISUSERNAME | vSphere Center Server login username                           |
+    | $ENVVISPASSWORD | vSphere Center Server login password                           |
+    | $ENVVISPROTOCOL | Connection protocol with vSphere Center Server, such as HTTPS. |
+
+3.  Edit xml\debug_demo.xml, replace ESXI_HOST_IPADDRESS and VM_NAME with your settings.
+4.  Run demo case with one of the following cmdlets:
+
+```.\lisa.ps1 run .\xml\debug_demo.xml -dbgLevel 10```
+
+Or
+
+```.\lisa.ps1 run .\xml\debug_demo.xml -vmName VM_NAME -hvServer ESXI_HOST_IPADDRESS -sshKey demo_id_rsa.ppk -suite debug_demo_suite -os Linux -dbgLevel 10```
+
+
 ## The basics behavior of the automation is:
 1.  Start a VM
 2.  Push files to a VM
@@ -117,53 +172,3 @@ A very simple XML file would look something like the following:
 
     </config>
 
-## VM provision
-The automation scripts make some assumptions about the VMs
-used to run the tests.  This requires test VMs be provisioned
-prior to running tests. The following settings need to be provisioned.
-
-1.  Disable Linux firewall.
-2.  Add your public key into ~/.ssh/authorized_keys.
-3.  The following packages must be installed.
-    *  development-tools
-    *  at
-    *  dos2unix
-    *  dosfstools
-    *  wget
-    *  bc
-    *  ntpdate
-4.  The yum repo must be configured.
-
-## SSH key
-SSH keys are used to pass commands to Linux VMs, so the public
-ssh Key must to copied to the VM before the test is started.
-
-## dos2unix
-The dos2unix must be installed.  It is used to ensure the file
-has the correct end of line character.
-
-## Putty with private key
-The automation scripts currently use Putty as the SSH client.
-You will need to copy the Putty executables to the ./bin
-directory.  You will also need to convert the private key into
-a Putty Private Key (.ppk).
-
-## How to configure a case development environment?
-1.  Choose a Windows machine which has Powershell installed and have connection with VCenter server
-2.  Download and install Git client for Windows, like Git-2.8.1-64bit.exe
-3.  Download and install a code editor, such as [Atom](https://atom.io/) or [Visual Studio Code](https://code.visualstudio.com/).
-4.  Add four system environment variables from Control Pannel -> System -> Advanced system settings -> Environment Variables... -> System variables -> New...
-
-    | Name            | Description                                                    |
-    |-----------------|----------------------------------------------------------------|
-    | $ENVVISIPADDR   | vSphere Center Server IP address                               |
-    | $ENVVISUSERNAME | vSphere Center Server login username                           |
-    | $ENVVISPASSWORD | vSphere Center Server login password                           |
-    | $ENVVISPROTOCOL | Connection protocol with vSphere Center Server, such as HTTPS. |
-
-5.  Edit xml\debug_demo.xml, replace ESXI_HOST_IPADDRESS and VM_NAME with your settings.
-6.  Run demo case with one of the following cmdlets:
-
-```.\lisa.ps1 run .\xml\debug_demo.xml -dbgLevel 10```
-
-```.\lisa.ps1 run .\xml\debug_demo.xml -vmName VM_NAME -hvServer ESXI_HOST_IPADDRESS -sshKey demo_id_rsa.ppk -suite debug_demo_suite -os Linux -dbgLevel 10```
